@@ -1,0 +1,23 @@
+{
+  "name": "rest-api",
+  "version": "1.0.0",
+  "description": "rest-api",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx tsc -w",
+    "dev": "npx nodemon",
+    "build": "tsx"
+  },
+  "author": "ilham",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "nodemon": "^3.1.7"
+  }
+}
