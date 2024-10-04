@@ -1,32 +1,20 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from 'express'
 import { logger } from '../utils/logger'
 import { createProductValidateion } from '../validate/product.validate'
+import { getDataProduct } from '../services/product.services'
+import ProductModel from '../models/product.model'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getProduct = (req: Request, res: Response, next: NextFunction): any => {
-  const products = [
-    {
-      id: 1,
-      name: 'Product 1',
-      price: 10000,
-    },
-    {
-      id: 2,
-      name: 'Product 2',
-      price: 20000,
-    },
-    {
-      id: 3,
-      name: 'Product 3',
-      price: 30000,
-    },
-  ]
+// getProduct
+export const getProduct = async (req: Request, res: Response): Promise<any> => {
+  const products = await getDataProduct()
+
   const {
     params: { id },
   } = req
 
   if (id) {
-    const product = products.find((product) => product.id === Number(id))
+    const product = await ProductModel.findById(id).exec()
     if (product === undefined) {
       logger.info('endpoint: /product detail failed')
       return res.status(404).send({
@@ -53,8 +41,6 @@ export const getProduct = (req: Request, res: Response, next: NextFunction): any
     statusCode: 200,
     data: products,
   })
-
-  next()
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
