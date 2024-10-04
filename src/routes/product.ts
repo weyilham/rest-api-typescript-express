@@ -1,6 +1,6 @@
 import { Router } from 'express'
 // controller
-import { getProduct, createProduct } from '../controller/product.controller'
+import { getProduct, createProduct, getProductId } from '../controller/product.controller'
 
 export const ProductRouter: Router = Router()
 
@@ -8,7 +8,7 @@ export const ProductRouter: Router = Router()
 ProductRouter.get('/', getProduct)
 
 // Endpoint GET untuk detail produk
-ProductRouter.get('/:id', getProduct)
+ProductRouter.get('/:id', getProductId)
 
 // Endpoint POST untuk menambahkan produk
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

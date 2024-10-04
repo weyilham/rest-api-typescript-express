@@ -1,40 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { NextFunction, Request, Response } from 'express'
+import { Request, Response } from 'express'
 import { logger } from '../utils/logger'
 import { createProductValidateion } from '../validate/product.validate'
-import { getDataProduct } from '../services/product.services'
+import { getDataProduct, getProductById } from '../services/product.services'
 import ProductModel from '../models/product.model'
+import { v4 as uuidv4 } from 'uuid'
 
 // getProduct
 export const getProduct = async (req: Request, res: Response): Promise<any> => {
   const products = await getDataProduct()
-
-  const {
-    params: { id },
-  } = req
-
-  if (id) {
-    const product = await ProductModel.findById(id).exec()
-    if (product === undefined) {
-      logger.info('endpoint: /product detail failed')
-      return res.status(404).send({
-        status: false,
-        statusCode: 404,
-        message: 'Product not found',
-        data: {},
-      })
-    }
-
-    if (product) {
-      logger.info('endpoint: /product detail success')
-      return res.status(200).send({
-        status: true,
-        statusCode: 200,
-        data: product,
-      })
-    }
-  }
-
   logger.info('endpoint: /product success')
   return res.status(200).send({
     status: true,
@@ -43,9 +17,34 @@ export const getProduct = async (req: Request, res: Response): Promise<any> => {
   })
 }
 
+export const getProductId = async (req: Request, res: Response): Promise<any> => {
+  const { id } = req.params
+
+  // check product
+  const product = await getProductById(id)
+  if (!product) {
+    logger.info('Error: Product not found')
+    return res.status(404).send({
+      status: false,
+      statusCode: 404,
+      message: 'Product not found',
+      data: {},
+    })
+  } else {
+    logger.info('endpoint: /product success')
+    return res.status(200).send({
+      status: true,
+      statusCode: 200,
+      data: product,
+    })
+  }
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const createProduct = (req: Request, res: Response, next: NextFunction): any => {
+export const createProduct = async (req: Request, res: Response): Promise<any> => {
+  req.body.product_id = uuidv4()
   const { error, value } = createProductValidateion(req.body)
+
   if (error) {
     logger.info('Error: Product validation failed', error.details[0].message)
     return res.status(422).send({
@@ -55,13 +54,23 @@ export const createProduct = (req: Request, res: Response, next: NextFunction): 
       data: {},
     })
   }
-  logger.info('endpoint: add data product success')
-  return res.status(200).send({
-    status: true,
-    statusCode: 200,
-    message: 'add data product success',
-    data: value,
-  })
 
-  next()
+  try {
+    const product = await ProductModel.create(value)
+    if (product) {
+      logger.info('endpoint: add data product success')
+      return res.status(200).send({
+        status: true,
+        statusCode: 200,
+        message: 'add data product success',
+      })
+    }
+  } catch (err) {
+    logger.info('Error: add data product failed', err)
+    return res.status(500).send({
+      status: false,
+      statusCode: 500,
+      message: 'add data product failed',
+    })
+  }
 }
