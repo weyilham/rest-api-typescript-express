@@ -20,3 +20,7 @@ export const getProductById = async (id: string) => {
 export const createProduct = async (payload: ProductInterface) => {
   return await ProductModel.create(payload)
 }
+
+export const updateProduct = async (id: string, payload: ProductInterface) => {
+  return await ProductModel.findByIdAndUpdate(id, payload)
+}

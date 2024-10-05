@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express'
 import { logger } from '../utils/logger'
-import { createProductValidateion } from '../validate/product.validate'
-import { getDataProduct, getProductById } from '../services/product.services'
+import { createProductValidateion, updateProductValidation } from '../validate/product.validate'
+import { getDataProduct, getProductById, updateProduct } from '../services/product.services'
 import ProductModel from '../models/product.model'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -71,6 +71,38 @@ export const createProduct = async (req: Request, res: Response): Promise<any> =
       status: false,
       statusCode: 500,
       message: 'add data product failed',
+    })
+  }
+}
+
+export const updateDataProduct = async (req: Request, res: Response): Promise<any> => {
+  const { id } = req.params
+  const { error, value } = updateProductValidation(req.body)
+
+  if (error) {
+    logger.info('Error: Product validation failed', error.details[0].message)
+    return res.status(422).send({
+      status: false,
+      statusCode: 422,
+      message: error.details[0].message,
+      data: {},
+    })
+  }
+
+  try {
+    await updateProduct(id, value)
+    logger.info('endpoint: update data product success')
+    return res.status(200).send({
+      status: true,
+      statusCode: 200,
+      message: 'update data product success',
+    })
+  } catch (error) {
+    logger.info('Error: update data product failed', error)
+    return res.status(500).send({
+      status: false,
+      statusCode: 500,
+      message: 'update data product failed',
     })
   }
 }
