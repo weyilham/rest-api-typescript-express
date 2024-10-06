@@ -14,7 +14,9 @@ export const getDataProduct = async () => {
 }
 
 export const getProductById = async (id: string) => {
-  return await ProductModel.findById(id)
+  const result = await ProductModel.findById(id)
+
+  return result
 }
 
 export const createProduct = async (payload: ProductInterface) => {
@@ -23,4 +25,8 @@ export const createProduct = async (payload: ProductInterface) => {
 
 export const updateProduct = async (id: string, payload: ProductInterface) => {
   return await ProductModel.findByIdAndUpdate(id, payload)
+}
+
+export const deleteProductById = async (id: string) => {
+  return await ProductModel.findByIdAndDelete(id)
 }
